@@ -35,12 +35,15 @@ function GoogleIcon({ className }: { className?: string }) {
 const FIELD_CLASSES =
   "h-11 rounded-lg border-white/15 bg-[#101010] px-3.5 text-[15px] text-white placeholder:text-white/40 hover:border-white/25 focus-visible:border-[#5c53fe] focus-visible:ring-2 focus-visible:ring-[#5c53fe]/30"
 
+type UserRole = "seeker" | "recruiter" | "admin"
+
 export default function SignUpPage() {
   const [formData, setFormData] = React.useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
+    role: "seeker" as UserRole,
     agreeTerms: false,
   })
   const [showPassword, setShowPassword] = React.useState(false)
@@ -75,11 +78,12 @@ export default function SignUpPage() {
     setLoading(true)
 
     try {
-      // 3. Call Better-Auth signUp using the form state (avoiding variable shadowing)
+      // 3. Call Better-Auth signUp with custom role and form state
       const { data: resData, error } = await authClient.signUp.email({
         name: formData.name,
         email: formData.email,
         password: formData.password,
+        role: formData.role,
         callbackURL: "/",
       })
 
@@ -142,6 +146,45 @@ export default function SignUpPage() {
 
       {/* Sign Up Form */}
       <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        {/* Role Selection */}
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium text-white/70">
+            I am joining as
+          </label>
+          <div
+            role="radiogroup"
+            aria-label="Account type"
+            className="grid grid-cols-3 gap-1 rounded-xl border border-white/10 bg-[#101010] p-1"
+          >
+            {[
+              { id: "seeker" as const, label: "Job Seeker" },
+              { id: "recruiter" as const, label: "Recruiter" },
+              { id: "admin" as const, label: "Admin" },
+            ].map((item) => {
+              const active = formData.role === item.id
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  onClick={() =>
+                    setFormData((prev) => ({ ...prev, role: item.id }))
+                  }
+                  className={cn(
+                    "cursor-pointer rounded-lg py-2 text-center text-xs font-medium transition-all sm:text-sm",
+                    active
+                      ? "bg-[#5c53fe] text-white shadow-sm"
+                      : "text-white/60 hover:text-white"
+                  )}
+                >
+                  {item.label}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
         {/* Full Name */}
         <div className="flex flex-col gap-2">
           <label htmlFor="name" className="text-sm font-medium text-white/70">
