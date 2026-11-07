@@ -75,26 +75,6 @@ export default function SignInPage() {
 
   return (
     <div className="relative z-10 flex w-full max-w-md flex-col gap-6 rounded-2xl border border-white/10 bg-[#151516] p-6 shadow-[0_4px_24px_rgba(0,0,0,0.4)] sm:p-8">
-      {/* Mode toggle */}
-      <div
-        role="tablist"
-        aria-label="Authentication mode"
-        className="grid grid-cols-2 gap-1 rounded-xl bg-[#101010] p-1"
-      >
-        <Link
-          href="/sign-in"
-          className="rounded-lg bg-[#5c53fe] py-2 text-center text-sm font-medium text-white transition-colors"
-        >
-          Sign In
-        </Link>
-        <Link
-          href="/sign-up"
-          className="rounded-lg py-2 text-center text-sm font-medium text-white/60 transition-colors hover:text-white"
-        >
-          Sign Up
-        </Link>
-      </div>
-
       {/* Header */}
       <div className="flex flex-col gap-1.5">
         <h1 className="font-heading text-2xl font-bold leading-tight text-white sm:text-3xl">
