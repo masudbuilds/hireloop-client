@@ -1,17 +1,21 @@
 import { betterAuth } from "better-auth";
 import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
+import { nextCookies } from "better-auth/next-js";
 
 const client = new MongoClient(process.env.MONGODB_URI as string);
 const db = client.db("hireloop"); 
 
 export const auth = betterAuth({
+  baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
   emailAndPassword: {
     enabled: true,
+    autoSignIn: true,
   },
   database: mongodbAdapter(db, {
     client,
   }),
+  plugins: [nextCookies()],
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID as string,

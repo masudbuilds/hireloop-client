@@ -7,6 +7,7 @@ import { EyeIcon, EyeOffIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
+import { authClient } from "@/lib/auth-client"
 
 function GoogleIcon({ className }: { className?: string }) {
   return (
@@ -44,6 +45,7 @@ export default function SignUpPage() {
   })
   const [showPassword, setShowPassword] = React.useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false)
+  const [loading, setLoading] = React.useState(false)
 
   // Handle input change and update form state
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,18 +57,49 @@ export default function SignUpPage() {
   }
 
   // Event handler that collects form data on submission
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    // Form data collected
-    console.log("Sign Up form submitted with data:", formData)
+    // 1. Validate password confirmation
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match. Please verify your password.")
+      return
+    }
 
-    // TODO: Integrate functionality later
-    // e.g. await authClient.signUp.email({
-    //   name: formData.name,
-    //   email: formData.email,
-    //   password: formData.password,
-    // })
+    // 2. Validate terms agreement
+    if (!formData.agreeTerms) {
+      alert("Please agree to the Terms of Service and Privacy Policy.")
+      return
+    }
+
+    setLoading(true)
+
+    try {
+      // 3. Call Better-Auth signUp using the form state (avoiding variable shadowing)
+      const { data: resData, error } = await authClient.signUp.email({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        callbackURL: "/",
+      })
+
+      // 4. Handle sign-up error
+      if (error) {
+        console.error("Sign up error:", error)
+        alert(error.message || "Failed to create account. Please try again.")
+        setLoading(false)
+        return
+      }
+
+      console.log("Sign Up successful:", resData)
+
+      // 5. Redirect on success
+      window.location.href = "/"
+    } catch (err) {
+      console.error("Unexpected error during sign up:", err)
+      alert("An unexpected error occurred. Please try again.")
+      setLoading(false)
+    }
   }
 
   // Event handler for social sign-up
@@ -251,9 +284,10 @@ export default function SignUpPage() {
         {/* Submit */}
         <Button
           type="submit"
-          className="h-11 w-full rounded-lg bg-[#5c53fe] text-[15px] font-medium text-white shadow-[inset_0_0_10px_rgba(255,255,255,0.2)] hover:bg-[#5c53fe]/90 transition-all cursor-pointer"
+          disabled={loading}
+          className="h-11 w-full rounded-lg bg-[#5c53fe] text-[15px] font-medium text-white shadow-[inset_0_0_10px_rgba(255,255,255,0.2)] hover:bg-[#5c53fe]/90 transition-all cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Create Account
+          {loading ? "Creating account..." : "Create Account"}
         </Button>
       </form>
 
