@@ -1,3 +1,4 @@
+"use client"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -12,6 +13,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
+import { useSession } from "@/lib/auth-client"
 
 const NAV_LINKS = [
   { label: "Browse Jobs", href: "/jobs" },
@@ -45,6 +47,7 @@ function Logo({ className }: { className?: string }) {
 }
 
 function DesktopNav() {
+  const { data: session } = useSession()
   return (
     <nav aria-label="Main" className="hidden items-center lg:flex">
       <ul className="flex items-center gap-10">
@@ -61,26 +64,33 @@ function DesktopNav() {
       </ul>
       <span aria-hidden="true" className="mx-6 h-6 w-px bg-[#a8a8a8]/40" />
       <div className="flex items-center gap-4">
-        <Button
-          nativeButton={false}
-          render={<Link href="/sign-in" />}
-          className={signInClasses}
-        >
-          Sign In
-        </Button>
-        <Button
-          nativeButton={false}
-          render={<Link href="/sign-up" />}
-          className={getStartedClasses}
-        >
-          Get Started
-        </Button>
+        {session?.user ? (
+          <span className="text-white">{`Welcome, ${session?.user.name}`}</span>
+        ) : (
+          <>
+            <Button
+              nativeButton={false}
+              render={<Link href="/sign-in" />}
+              className={signInClasses}
+            >
+              Sign In
+            </Button>
+            <Button
+              nativeButton={false}
+              render={<Link href="/sign-up" />}
+              className={getStartedClasses}
+            >
+              Get Started
+            </Button>
+          </>
+        )}
       </div>
     </nav>
   )
 }
 
 function MobileNav() {
+  const { data: session } = useSession()
   return (
     <Sheet>
       <SheetTrigger
@@ -123,30 +133,36 @@ function MobileNav() {
           </ul>
         </nav>
         <div className="flex flex-col gap-3 px-4 pb-4">
-          <SheetTrigger
-            render={
-              <Link
-                href="/sign-in"
-                className={buttonVariants({
-                  className: cn(signInClasses, "w-full"),
-                })}
-              />
-            }
-          >
-            Sign In
-          </SheetTrigger>
-          <SheetTrigger
-            render={
-              <Link
-                href="/sign-up"
-                className={buttonVariants({
-                  className: cn(getStartedClasses, "w-full"),
-                })}
-              />
-            }
-          >
-            Get Started
-          </SheetTrigger>
+          {session?.user ? (
+            <span className="text-white">{`Welcome, ${session?.user.name}`}</span>
+          ) : (
+            <>
+              <SheetTrigger
+                render={
+                  <Link
+                    href="/sign-in"
+                    className={buttonVariants({
+                      className: cn(signInClasses, "w-full"),
+                    })}
+                  />
+                }
+              >
+                Sign In
+              </SheetTrigger>
+              <SheetTrigger
+                render={
+                  <Link
+                    href="/sign-up"
+                    className={buttonVariants({
+                      className: cn(getStartedClasses, "w-full"),
+                    })}
+                  />
+                }
+              >
+                Get Started
+              </SheetTrigger>
+            </>
+          )}
         </div>
       </SheetContent>
     </Sheet>
