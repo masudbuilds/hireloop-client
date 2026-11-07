@@ -7,6 +7,7 @@ import { EyeIcon, EyeOffIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
+import { authClient } from "@/lib/auth-client"
 
 function GoogleIcon({ className }: { className?: string }) {
   return (
@@ -41,6 +42,7 @@ export default function SignInPage() {
     rememberMe: false,
   })
   const [showPassword, setShowPassword] = React.useState(false)
+  const [loading, setLoading] = React.useState(false)
 
   // Handle input change and update form state
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,17 +54,40 @@ export default function SignInPage() {
   }
 
   // Event handler that collects form data on submission
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    // Form data collected
-    console.log("Sign In form submitted with data:", formData)
+    setLoading(true)
 
-    // TODO: Integrate functionality later
-    // e.g. await authClient.signIn.email({
-    //   email: formData.email,
-    //   password: formData.password,
-    // })
+    try {
+      // Call Better-Auth signIn with email and password
+      const { data: resData, error } = await authClient.signIn.email({
+        email: formData.email,
+        password: formData.password,
+        rememberMe: formData.rememberMe,
+        callbackURL: "/",
+      })
+
+      // Handle sign-in error (e.g. invalid credentials)
+      if (error) {
+        console.error("Sign in error:", error)
+        alert(
+          error.message ||
+            "Failed to sign in. Please check your email and password."
+        )
+        setLoading(false)
+        return
+      }
+
+      console.log("Sign In successful:", resData)
+
+      // Redirect on success
+      window.location.href = "/"
+    } catch (err) {
+      console.error("Unexpected error during sign in:", err)
+      alert("An unexpected error occurred. Please try again.")
+      setLoading(false)
+    }
   }
 
   // Event handler for social sign-in
@@ -188,9 +213,10 @@ export default function SignInPage() {
         {/* Submit */}
         <Button
           type="submit"
-          className="h-11 w-full rounded-lg bg-[#5c53fe] text-[15px] font-medium text-white shadow-[inset_0_0_10px_rgba(255,255,255,0.2)] hover:bg-[#5c53fe]/90 transition-all cursor-pointer"
+          disabled={loading}
+          className="h-11 w-full rounded-lg bg-[#5c53fe] text-[15px] font-medium text-white shadow-[inset_0_0_10px_rgba(255,255,255,0.2)] hover:bg-[#5c53fe]/90 transition-all cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Sign In
+          {loading ? "Signing in..." : "Sign In"}
         </Button>
       </form>
 
