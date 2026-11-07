@@ -13,7 +13,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
-import { useSession } from "@/lib/auth-client"
+import { useSession, signOut } from "@/lib/auth-client"
 
 const NAV_LINKS = [
   { label: "Browse Jobs", href: "/jobs" },
@@ -65,7 +65,15 @@ function DesktopNav() {
       <span aria-hidden="true" className="mx-6 h-6 w-px bg-[#a8a8a8]/40" />
       <div className="flex items-center gap-4">
         {session?.user ? (
-          <span className="text-white">{`Welcome, ${session?.user.name}`}</span>
+          <>
+            <span className="text-white">{`Welcome, ${session?.user.name}`}</span>
+            <Button
+              onClick={() => signOut()}
+              className="h-11 rounded-lg bg-red-500 px-6 text-[15px] font-semibold text-[#fdf9f9] shadow-[inset_0_0_10px_rgba(255,255,255,0.2)] hover:bg-red-500/90"
+            >
+              Sign Out
+            </Button>
+          </>
         ) : (
           <>
             <Button
@@ -122,6 +130,7 @@ function MobileNav() {
             {NAV_LINKS.map((link) => (
               <li key={link.href}>
                 <SheetTrigger
+                  nativeButton={false}
                   render={<Link href={link.href} className="block" />}
                 >
                   <span className="block py-3 text-base text-white transition-colors hover:text-[#a8a8a8]">
@@ -134,10 +143,19 @@ function MobileNav() {
         </nav>
         <div className="flex flex-col gap-3 px-4 pb-4">
           {session?.user ? (
-            <span className="text-white">{`Welcome, ${session?.user.name}`}</span>
+            <>
+              <span className="text-white">{`Welcome, ${session?.user.name}`}</span>
+              <Button
+                onClick={() => signOut()}
+                className="h-11 rounded-lg bg-red-500 px-6 text-[15px] font-semibold text-[#fdf9f9] shadow-[inset_0_0_10px_rgba(255,255,255,0.2)] hover:bg-red-500/90"
+              >
+                Sign Out
+              </Button>
+            </>
           ) : (
             <>
               <SheetTrigger
+                nativeButton={false}
                 render={
                   <Link
                     href="/sign-in"
@@ -150,6 +168,7 @@ function MobileNav() {
                 Sign In
               </SheetTrigger>
               <SheetTrigger
+                nativeButton={false}
                 render={
                   <Link
                     href="/sign-up"
