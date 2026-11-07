@@ -24,11 +24,6 @@ type AuthSubmitData = {
  */
 export type AuthSubmitHandler = (data: AuthSubmitData) => void | Promise<void>
 
-const MODES: Array<{ id: AuthMode; label: string }> = [
-  { id: "sign-in", label: "Sign In" },
-  { id: "sign-up", label: "Sign Up" },
-]
-
 const AUTH_FIELD_CLASSES =
   "h-11 rounded-lg border-white/15 bg-[#101010] px-3.5 text-[15px] text-white placeholder:text-white/50 hover:border-white/25 focus-visible:border-[#5c53fe] focus-visible:ring-[#5c53fe]/30"
 
@@ -243,31 +238,6 @@ export function AuthCard({
         className
       )}
     >
-      {/* Mode toggle */}
-      <div
-        role="tablist"
-        aria-label="Authentication mode"
-        className="grid auto-cols-fr grid-flow-col gap-1 rounded-xl bg-[#101010] p-1"
-      >
-        {MODES.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            role="tab"
-            aria-selected={mode === item.id}
-            onClick={() => switchMode(item.id)}
-            className={cn(
-              "rounded-lg py-2 text-sm font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#5c53fe]/60",
-              mode === item.id
-                ? "bg-[#5c53fe] text-white"
-                : "text-white/60 hover:text-white"
-            )}
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
-
       <div className="flex flex-col gap-1.5">
         <h1 className="font-heading text-2xl font-bold leading-tight text-white sm:text-3xl">
           {mode === "sign-in" ? "Welcome back" : "Create your account"}
@@ -299,6 +269,32 @@ export function AuthCard({
       ) : (
         <SignUpForm key="sign-up" onSubmit={onSubmit} />
       )}
+
+      <p className="text-center text-sm text-white/60">
+        {mode === "sign-in" ? (
+          <>
+            Don&apos;t have an account?{" "}
+            <button
+              type="button"
+              onClick={() => switchMode("sign-up")}
+              className="font-medium text-[#5c53fe] transition-colors hover:text-[#7c74ff] hover:underline cursor-pointer"
+            >
+              Sign up
+            </button>
+          </>
+        ) : (
+          <>
+            Already have an account?{" "}
+            <button
+              type="button"
+              onClick={() => switchMode("sign-in")}
+              className="font-medium text-[#5c53fe] transition-colors hover:text-[#7c74ff] hover:underline cursor-pointer"
+            >
+              Sign in
+            </button>
+          </>
+        )}
+      </p>
 
       <p className="text-center text-xs leading-relaxed text-white/40">
         By continuing, you agree to HireLoop&apos;s Terms of Service and Privacy
