@@ -1,6 +1,8 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { DashboardSidebar } from "../components/DashboardSidebar"
 import { TooltipProvider } from "@/components/ui/tooltip"
+import {Toaster} from "@/components/ui/toast"
+
 
 const DashboardLayout = ({children} : {children: React.ReactNode}) => {
   return (
@@ -11,6 +13,7 @@ const DashboardLayout = ({children} : {children: React.ReactNode}) => {
           <SidebarTrigger />
           {children}
         </main>
+        <Toaster/>
       </TooltipProvider>
     </SidebarProvider>
   )

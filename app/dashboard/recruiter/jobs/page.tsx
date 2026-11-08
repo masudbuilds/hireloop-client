@@ -44,9 +44,10 @@ import {
 import type { JobFormData } from "./new/page"
 import { cn } from "@/lib/utils"
 import { getJobs } from "@/lib/api/jobs"
+import { DeleteJobDialog } from "@/app/components/DeleteJobDialog"
 
 export interface ManagedJobPost extends JobFormData {
-  id: string
+  _id: string
   status: "Active" | "Closed" | "Draft"
   applicantsCount: number
   viewsCount: number
@@ -55,6 +56,22 @@ export interface ManagedJobPost extends JobFormData {
 }
 
 const PLAN_LIMIT = 10
+
+function normalizeCount(value: unknown, jobId: string, field: string): number {
+  const count =
+    typeof value === "number"
+      ? value
+      : typeof value === "string" && value.trim() !== ""
+        ? Number(value)
+        : NaN
+
+  if (Number.isFinite(count) && count >= 0) {
+    return count
+  }
+
+  console.warn(`Invalid ${field} for job ${jobId}; using 0.`)
+  return 0
+}
 
 export default function ManageJobsPage() {
   const [jobs, setJobs] = React.useState<ManagedJobPost[]>([])
@@ -71,7 +88,21 @@ export default function ManageJobsPage() {
         setIsLoading(true)
         const fetchedJobs = await getJobs()
         if (isMounted && Array.isArray(fetchedJobs)) {
-          setJobs(fetchedJobs)
+          setJobs(
+            fetchedJobs.map((job) => ({
+              ...job,
+              applicantsCount: normalizeCount(
+                job.applicantsCount,
+                job._id,
+                "applicantsCount"
+              ),
+              viewsCount: normalizeCount(
+                job.viewsCount,
+                job._id,
+                "viewsCount"
+              ),
+            }))
+          )
         }
       } catch (err) {
         console.error("Failed to load jobs from API:", err)
@@ -93,20 +124,13 @@ export default function ManageJobsPage() {
   const handleToggleStatus = (jobId: string) => {
     setJobs((prev) =>
       prev.map((job) => {
-        if (job.id === jobId) {
+        if (job._id === jobId) {
           const nextStatus = job.status === "Active" ? "Closed" : "Active"
           return { ...job, status: nextStatus }
         }
         return job
       })
     )
-  }
-
-  // Delete job listing
-  const handleDeleteJob = (jobId: string) => {
-    if (confirm("Are you sure you want to remove this job posting?")) {
-      setJobs((prev) => prev.filter((job) => job.id !== jobId))
-    }
   }
 
   // Filter calculations
@@ -173,6 +197,7 @@ export default function ManageJobsPage() {
 
         {/* Post New Job Action Button */}
         <Button
+          nativeButton={false}
           render={<Link href="/dashboard/recruiter/jobs/new" />}
           className="gap-2"
         >
@@ -395,13 +420,17 @@ export default function ManageJobsPage() {
                         <div className="flex size-10 items-center justify-center rounded-xl bg-muted text-muted-foreground">
                           <Briefcase className="size-5" />
                         </div>
-                        <h4 className="font-semibold text-foreground">No job postings yet</h4>
+                        <h4 className="font-semibold text-foreground">
+                          No job postings yet
+                        </h4>
                         <p className="max-w-sm text-xs text-muted-foreground">
-                          Create your first job listing to start receiving applications from qualified candidates.
+                          Create your first job listing to start receiving
+                          applications from qualified candidates.
                         </p>
                         <Button
                           size="xs"
                           className="mt-2 gap-1.5"
+                          nativeButton={false}
                           render={<Link href="/dashboard/recruiter/jobs/new" />}
                         >
                           <Plus className="size-3.5" />
@@ -415,7 +444,7 @@ export default function ManageJobsPage() {
                 </TableRow>
               ) : (
                 filteredJobs.map((job) => (
-                  <TableRow key={job.id} className="group">
+                  <TableRow key={job._id} className="group">
                     {/* Job Title & Category */}
                     <TableCell>
                       <div className="flex items-start gap-3">
@@ -471,7 +500,7 @@ export default function ManageJobsPage() {
                     {/* Applicants */}
                     <TableCell>
                       <Link
-                        href={`/dashboard/jobs/${job.id}/applicants`}
+                        href={`/dashboard/jobs/${job._id}/applicants`}
                         className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
                       >
                         <Users className="size-3.5" />
@@ -523,9 +552,10 @@ export default function ManageJobsPage() {
                           size="xs"
                           variant="ghost"
                           title="View Applicants"
+                          nativeButton={false}
                           render={
                             <Link
-                              href={`/dashboard/jobs/${job.id}/applicants`}
+                              href={`/dashboard/jobs/${job._id}/applicants`}
                             />
                           }
                         >
@@ -535,7 +565,7 @@ export default function ManageJobsPage() {
                         <Button
                           size="xs"
                           variant="ghost"
-                          onClick={() => handleToggleStatus(job.id)}
+                          onClick={() => handleToggleStatus(job._id)}
                           title={
                             job.status === "Active" ? "Close Job" : "Reopen Job"
                           }
@@ -548,15 +578,7 @@ export default function ManageJobsPage() {
                           )}
                         </Button>
 
-                        <Button
-                          size="xs"
-                          variant="ghost"
-                          onClick={() => handleDeleteJob(job.id)}
-                          title="Delete Job"
-                          className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                        >
-                          <Trash2 className="size-3.5" />
-                        </Button>
+                        <DeleteJobDialog job={job} />
                       </div>
                     </TableCell>
                   </TableRow>
@@ -580,13 +602,17 @@ export default function ManageJobsPage() {
                   <div className="flex size-10 items-center justify-center rounded-xl bg-muted text-muted-foreground">
                     <Briefcase className="size-5" />
                   </div>
-                  <h4 className="font-semibold text-foreground">No job postings yet</h4>
+                  <h4 className="font-semibold text-foreground">
+                    No job postings yet
+                  </h4>
                   <p className="max-w-xs text-xs text-muted-foreground">
-                    Create your first job listing to start receiving applications.
+                    Create your first job listing to start receiving
+                    applications.
                   </p>
                   <Button
                     size="xs"
                     className="mt-2 gap-1.5"
+                    nativeButton={false}
                     render={<Link href="/dashboard/recruiter/jobs/new" />}
                   >
                     <Plus className="size-3.5" />
@@ -599,7 +625,7 @@ export default function ManageJobsPage() {
             </div>
           ) : (
             filteredJobs.map((job) => (
-              <div key={job.id} className="space-y-3 p-4">
+              <div key={job._id} className="space-y-3 p-4">
                 <div className="flex items-start justify-between gap-2">
                   <div className="space-y-1">
                     <span className="font-semibold text-foreground">
@@ -642,7 +668,7 @@ export default function ManageJobsPage() {
 
                 <div className="flex items-center justify-between border-t border-border pt-2 text-xs">
                   <Link
-                    href={`/dashboard/jobs/${job.id}/applicants`}
+                    href={`/dashboard/jobs/${job._id}/applicants`}
                     className="flex items-center gap-1 font-medium text-primary"
                   >
                     <Users className="size-3.5" />
@@ -653,18 +679,11 @@ export default function ManageJobsPage() {
                     <Button
                       size="xs"
                       variant="outline"
-                      onClick={() => handleToggleStatus(job.id)}
+                      onClick={() => handleToggleStatus(job._id)}
                     >
                       {job.status === "Active" ? "Close" : "Reopen"}
                     </Button>
-                    <Button
-                      size="xs"
-                      variant="ghost"
-                      onClick={() => handleDeleteJob(job.id)}
-                      className="text-destructive hover:bg-destructive/10"
-                    >
-                      <Trash2 className="size-3.5" />
-                    </Button>
+                    <DeleteJobDialog job={job} />
                   </div>
                 </div>
               </div>
