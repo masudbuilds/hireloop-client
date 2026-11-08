@@ -7,6 +7,7 @@ import {
   Building2,
   FileText,
   LayoutDashboard,
+  PlusCircle,
   Settings,
   Users,
   Wallet,
@@ -91,6 +92,12 @@ export const menuItemByRole: Record<Role, MenuItem[]> = {
       name: "Manage Jobs",
       url: "/dashboard/recruiter/jobs",
       icon: Briefcase,
+    },
+    {
+      id: "add-job",
+      name: "Add Job",
+      url: "/dashboard/recruiter/new",
+      icon: PlusCircle,
     },
     {
       id: "applications",

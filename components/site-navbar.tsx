@@ -15,11 +15,7 @@ import {
 import { cn } from "@/lib/utils"
 import { useSession, signOut } from "@/lib/auth-client"
 
-const NAV_LINKS = [
-  { label: "Browse Jobs", href: "/jobs" },
-  { label: "Company", href: "/companies" },
-  { label: "Pricing", href: "/pricing" },
-] as const
+
 
 const signInClasses =
   "h-11 rounded-lg bg-white px-6 text-[15px] font-semibold text-[#5c53fe] shadow-[inset_0_0_10px_rgba(255,255,255,0.2)] hover:bg-white/90"
@@ -48,6 +44,15 @@ function Logo({ className }: { className?: string }) {
 
 function DesktopNav() {
   const { data: session } = useSession()
+  const NAV_LINKS = [
+    { label: "Browse Jobs", href: "/jobs" },
+    { label: "Company", href: "/companies" },
+    { label: "Pricing", href: "/pricing" },
+    {
+      label: "Dashboard",
+      href: `/dashboard/${session?.user?.role || "seeker"}`,
+    },
+  ] as const
   return (
     <nav aria-label="Main" className="hidden items-center lg:flex">
       <ul className="flex items-center gap-10">
@@ -99,6 +104,15 @@ function DesktopNav() {
 
 function MobileNav() {
   const { data: session } = useSession()
+  const NAV_LINKS = [
+    { label: "Browse Jobs", href: "/jobs" },
+    { label: "Company", href: "/companies" },
+    { label: "Pricing", href: "/pricing" },
+    {
+      label: "Dashboard",
+      href: `/dashboard/${session?.user?.role || "seeker"}`,
+    },
+  ] as const
   return (
     <Sheet>
       <SheetTrigger
