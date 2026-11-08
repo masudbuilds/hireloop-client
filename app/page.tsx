@@ -1,4 +1,4 @@
-import { HeroSection } from "@/components/hero-section"
+import { HeroSection } from "@/components/home/hero-section"
 import { SiteNavbar } from "@/components/site-navbar"
 import { JobDiscoverySection } from "@/components/home/job-discovery"
 import { FeaturesSection } from "@/components/home/features-section"
