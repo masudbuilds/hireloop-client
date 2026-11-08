@@ -7,6 +7,8 @@ import {
   SearchIcon,
 } from "lucide-react"
 
+import { HeroStats } from "@/components/home/hero-stats"
+
 const TRENDING_POSITIONS = [
   { label: "Product Designer", href: "/jobs?q=Product%20Designer" },
   { label: "AI Engineering", href: "/jobs?q=AI%20Engineering" },
@@ -155,6 +157,9 @@ export function HeroSection() {
           <HeroTrending />
         </div>
       </div>
+
+      {/* Hero Stats Sub-section */}
+      <HeroStats />
     </section>
   )
 }
