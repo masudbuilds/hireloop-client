@@ -15,11 +15,24 @@ export const createJob = async (data: JobFormData) => {
 }
 
 export const deleteJob = async (jobId: string) => {
-  const response = await fetch(`${BASE_URL}/jobs/${jobId}`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-  return response.json()
+  try {
+    const response = await fetch(`${BASE_URL}/jobs/${jobId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    if (!response.ok) {
+      const errorText = await response.text()
+      try {
+        return JSON.parse(errorText)
+      } catch {
+        return { error: `Server error: ${response.status}`, deletedCount: 0 }
+      }
+    }
+    return await response.json()
+  } catch (error) {
+    console.error("Error in deleteJob:", error)
+    return { error: (error as Error).message, deletedCount: 0 }
+  }
 }

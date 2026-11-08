@@ -120,6 +120,11 @@ export default function ManageJobsPage() {
     }
   }, [])
 
+  // Handle job deleted callback from DeleteJobDialog
+  const handleJobDeleted = React.useCallback((deletedJobId: string) => {
+    setJobs((prev) => prev.filter((job) => job._id !== deletedJobId))
+  }, [])
+
   // Toggle active/closed status
   const handleToggleStatus = (jobId: string) => {
     setJobs((prev) =>
@@ -578,7 +583,7 @@ export default function ManageJobsPage() {
                           )}
                         </Button>
 
-                        <DeleteJobDialog job={job} />
+                        <DeleteJobDialog job={job} onDeleted={handleJobDeleted} />
                       </div>
                     </TableCell>
                   </TableRow>
@@ -683,7 +688,7 @@ export default function ManageJobsPage() {
                     >
                       {job.status === "Active" ? "Close" : "Reopen"}
                     </Button>
-                    <DeleteJobDialog job={job} />
+                    <DeleteJobDialog job={job} onDeleted={handleJobDeleted} />
                   </div>
                 </div>
               </div>
