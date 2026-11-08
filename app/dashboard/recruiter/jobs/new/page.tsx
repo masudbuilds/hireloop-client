@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/card"
 import { useSession } from "@/lib/auth-client"
 import { cn } from "@/lib/utils"
+import { createJob } from "@/lib/actions/jobs"
 
 export interface JobFormData {
   title: string
@@ -120,6 +121,11 @@ export default function NewJobPage() {
   // Handle form submission and data collection
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    const jobData: JobFormData = { ...formData }
+
+    const result = await createJob(jobData)
+    console.log("Job data submitted to API:", jobData, "Result:", result)
+
     setErrorMessage(null)
 
     // Basic validation
@@ -228,7 +234,11 @@ export default function NewJobPage() {
                 >
                   Post Another Job
                 </Button>
-                <Button size="sm" render={<Link href="/dashboard/recruiter/jobs" />}>
+                <Button
+                  size="sm"
+                  nativeButton={false}
+                  render={<Link href="/dashboard/recruiter/jobs" />}
+                >
                   View All Jobs
                 </Button>
               </div>
@@ -535,6 +545,7 @@ export default function NewJobPage() {
               <Button
                 type="button"
                 variant="outline"
+                nativeButton={false}
                 render={<Link href="/dashboard/recruiter/jobs" />}
               >
                 Cancel
