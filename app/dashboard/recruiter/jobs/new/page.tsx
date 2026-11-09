@@ -31,6 +31,7 @@ import {
 import { useSession } from "@/lib/auth-client"
 import { cn } from "@/lib/utils"
 import { createJob } from "@/lib/actions/jobs"
+import { toast } from "@/components/ui/toast"
 
 export interface JobFormData {
   title: string
@@ -46,6 +47,8 @@ export interface JobFormData {
   responsibilities: string
   requirements: string
   benefits: string
+  status: "Active" | "Closed" | "Draft"
+  applicantsCount: number
 }
 
 const INITIAL_FORM_DATA: JobFormData = {
@@ -62,6 +65,8 @@ const INITIAL_FORM_DATA: JobFormData = {
   responsibilities: "",
   requirements: "",
   benefits: "",
+  status: "Draft",
+  applicantsCount: 0,
 }
 
 const JOB_CATEGORIES = [
@@ -151,6 +156,11 @@ export default function NewJobPage() {
     try {
       // Collected form data ready to be passed to an API endpoint or backend
       console.log("Collected Job Data:", formData)
+      toast.add({
+        type: "success",
+        title: "Job Posted",
+        description: "Your job listing has been successfully published.",
+      })
 
       // Simulate submission network delay
       await new Promise((resolve) => setTimeout(resolve, 800))

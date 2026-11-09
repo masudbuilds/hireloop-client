@@ -48,8 +48,6 @@ import { DeleteJobDialog } from "@/app/components/DeleteJobDialog"
 
 export interface ManagedJobPost extends JobFormData {
   _id: string
-  status: "Active" | "Closed" | "Draft"
-  applicantsCount: number
   viewsCount: number
   postedAt: string
   postedAgo: string
