@@ -41,35 +41,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import type { JobFormData } from "./new/page"
-import { cn } from "@/lib/utils"
+import { cn, formatSalary, normalizeCount } from "@/lib/utils"
 import { getJobs } from "@/lib/api/jobs"
 import { DeleteJobDialog } from "@/app/components/DeleteJobDialog"
+import { MetricCard } from "@/components/dashboard/metric-card"
+import { JobStatusBadge } from "@/components/dashboard/job-status-badge"
+import type { JobFormData, ManagedJobPost } from "@/types"
 
-export interface ManagedJobPost extends JobFormData {
-  _id: string
-  viewsCount: number
-  postedAt: string
-  postedAgo: string
-}
+export type { ManagedJobPost }
 
 const PLAN_LIMIT = 10
-
-function normalizeCount(value: unknown, jobId: string, field: string): number {
-  const count =
-    typeof value === "number"
-      ? value
-      : typeof value === "string" && value.trim() !== ""
-        ? Number(value)
-        : NaN
-
-  if (Number.isFinite(count) && count >= 0) {
-    return count
-  }
-
-  console.warn(`Invalid ${field} for job ${jobId}; using 0.`)
-  return 0
-}
 
 export default function ManageJobsPage() {
   const [jobs, setJobs] = React.useState<ManagedJobPost[]>([])
@@ -89,16 +70,14 @@ export default function ManageJobsPage() {
           setJobs(
             fetchedJobs.map((job) => ({
               ...job,
-              applicantsCount: normalizeCount(
-                job.applicantsCount,
-                job._id,
-                "applicantsCount"
-              ),
-              viewsCount: normalizeCount(
-                job.viewsCount,
-                job._id,
-                "viewsCount"
-              ),
+              applicantsCount: normalizeCount(job.applicantsCount, 0, {
+                id: job._id,
+                field: "applicantsCount",
+              }),
+              viewsCount: normalizeCount(job.viewsCount, 0, {
+                id: job._id,
+                field: "viewsCount",
+              }),
             }))
           )
         }
@@ -158,35 +137,6 @@ export default function ManageJobsPage() {
 
     return matchesSearch && matchesStatus && matchesCategory
   })
-
-  // Format compensation helper
-  const formatSalary = (job: ManagedJobPost) => {
-    if (!job.minSalary && !job.maxSalary) return "Negotiable"
-    const min = job.minSalary
-      ? `$${Number(job.minSalary).toLocaleString()}`
-      : ""
-    const max = job.maxSalary
-      ? `$${Number(job.maxSalary).toLocaleString()}`
-      : ""
-
-    let text = ""
-    if (min && max) {
-      text = `${min} - ${max}`
-    } else if (min) {
-      text = `${min}+`
-    } else {
-      text = `Up to ${max}`
-    }
-
-    const freqShort =
-      job.salaryFrequency === "per hour"
-        ? "/hr"
-        : job.salaryFrequency === "per month"
-          ? "/mo"
-          : "/yr"
-
-    return `${text} ${freqShort}`
-  }
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-6 p-4 sm:p-6 lg:p-8">
@@ -249,61 +199,30 @@ export default function ManageJobsPage() {
 
       {/* Stats Summary Cards Row */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="flex size-9 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-              <CheckCircle2 className="size-4" />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Active Jobs</p>
-              <h3 className="text-lg font-bold text-foreground">
-                {activeJobsCount}
-              </h3>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="flex size-9 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
-              <Users className="size-4" />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Total Applicants</p>
-              <h3 className="text-lg font-bold text-foreground">
-                {totalApplicantsCount}
-              </h3>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="flex size-9 items-center justify-center rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400">
-              <Building2 className="size-4" />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Total Views</p>
-              <h3 className="text-lg font-bold text-foreground">
-                {totalViewsCount}
-              </h3>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="flex size-9 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
-              <Clock className="size-4" />
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Total Posts</p>
-              <h3 className="text-lg font-bold text-foreground">
-                {jobs.length}
-              </h3>
-            </div>
-          </div>
-        </Card>
+        <MetricCard
+          title="Active Jobs"
+          value={activeJobsCount}
+          icon={CheckCircle2}
+          iconContainerClassName="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+        />
+        <MetricCard
+          title="Total Applicants"
+          value={totalApplicantsCount}
+          icon={Users}
+          iconContainerClassName="bg-blue-500/10 text-blue-600 dark:text-blue-400"
+        />
+        <MetricCard
+          title="Total Views"
+          value={totalViewsCount}
+          icon={Building2}
+          iconContainerClassName="bg-purple-500/10 text-purple-600 dark:text-purple-400"
+        />
+        <MetricCard
+          title="Total Posts"
+          value={jobs.length}
+          icon={Clock}
+          iconContainerClassName="bg-amber-500/10 text-amber-600 dark:text-amber-400"
+        />
       </div>
 
       {/* Filter and Search Bar */}
@@ -513,18 +432,7 @@ export default function ManageJobsPage() {
 
                     {/* Status Badge */}
                     <TableCell>
-                      <Badge
-                        variant={
-                          job.status === "Active"
-                            ? "success"
-                            : job.status === "Closed"
-                              ? "outline"
-                              : "warning"
-                        }
-                        className="capitalize"
-                      >
-                        {job.status}
-                      </Badge>
+                      <JobStatusBadge status={job.status} />
                     </TableCell>
 
                     {/* Deadline & Posted */}
@@ -638,17 +546,7 @@ export default function ManageJobsPage() {
                       {job.company} · {job.category}
                     </p>
                   </div>
-                  <Badge
-                    variant={
-                      job.status === "Active"
-                        ? "success"
-                        : job.status === "Closed"
-                          ? "outline"
-                          : "warning"
-                    }
-                  >
-                    {job.status}
-                  </Badge>
+                  <JobStatusBadge status={job.status} />
                 </div>
 
                 <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">

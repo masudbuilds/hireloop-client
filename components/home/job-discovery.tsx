@@ -1,6 +1,9 @@
 import Link from "next/link"
 import { ArrowRight, Briefcase, CircleDollarSign, MapPin } from "lucide-react"
 
+import { SectionHeader } from "@/components/home/section-header"
+import { MetaPill } from "@/components/home/meta-pill"
+
 const MOCK_JOBS = [
   {
     id: "1",
@@ -63,18 +66,10 @@ export function JobDiscoverySection() {
     <section className="relative py-20 sm:py-28 lg:py-32">
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="flex flex-col items-center text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
-            <span className="size-1.5 rounded-full bg-[#5c53fe]" />
-            <span className="font-badge text-xs uppercase tracking-wider text-white/80">
-              Smart job discovery
-            </span>
-          </div>
-
-          <h2 className="mt-4 font-heading text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl">
-            The roles you&apos;d never find by searching
-          </h2>
-        </div>
+        <SectionHeader
+          badge="Smart job discovery"
+          title="The roles you'd never find by searching"
+        />
 
         {/* 3x2 Job Cards Grid */}
         <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -93,18 +88,9 @@ export function JobDiscoverySection() {
 
                 {/* Metadata Badges */}
                 <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-white/70">
-                    <MapPin className="size-3.5 text-[#5c53fe]" />
-                    {job.location}
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-white/70">
-                    <Briefcase className="size-3.5 text-[#5c53fe]" />
-                    {job.type}
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-white/70">
-                    <CircleDollarSign className="size-3.5 text-[#5c53fe]" />
-                    {job.salary}
-                  </span>
+                  <MetaPill icon={MapPin} label={job.location} />
+                  <MetaPill icon={Briefcase} label={job.type} />
+                  <MetaPill icon={CircleDollarSign} label={job.salary} />
                 </div>
               </div>
 

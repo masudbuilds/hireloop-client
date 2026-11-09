@@ -9,6 +9,8 @@ import {
   TrendingUp,
 } from "lucide-react"
 
+import { SectionHeader } from "@/components/home/section-header"
+
 const FEATURES = [
   {
     title: "Smart Search",
@@ -57,18 +59,10 @@ export function FeaturesSection() {
     <section className="relative py-20 sm:py-28 lg:py-32">
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="flex flex-col items-center text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
-            <span className="size-1.5 rounded-full bg-[#5c53fe]" />
-            <span className="font-badge text-xs uppercase tracking-wider text-white/80">
-              features job
-            </span>
-          </div>
-
-          <h2 className="mt-4 font-heading text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl">
-            Everything you need to succeed
-          </h2>
-        </div>
+        <SectionHeader
+          badge="features job"
+          title="Everything you need to succeed"
+        />
 
         {/* 4x2 Feature Grid */}
         <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">

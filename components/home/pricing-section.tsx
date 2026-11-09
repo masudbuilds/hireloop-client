@@ -5,8 +5,9 @@ import Link from "next/link"
 import { ArrowRight, Check } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import type { PricingTier } from "@/types"
 
-const PRICING_TIERS = [
+const PRICING_TIERS: readonly PricingTier[] = [
   {
     name: "Starter",
     priceMonthly: "$0",

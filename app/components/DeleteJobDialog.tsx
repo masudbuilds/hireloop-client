@@ -17,7 +17,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import type { ManagedJobPost } from "@/app/dashboard/recruiter/jobs/page"
+import type { ManagedJobPost } from "@/types"
 import { deleteJob } from "@/lib/actions/jobs"
 import { toast } from "@/components/ui/toast"
 

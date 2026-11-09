@@ -25,15 +25,9 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { useSession } from "@/lib/auth-client"
+import type { Role, MenuItem } from "@/types"
 
-export type Role = "seeker" | "recruiter" | "admin"
-
-export interface MenuItem {
-  id: string
-  name: string
-  url: string
-  icon: LucideIcon
-}
+export type { Role, MenuItem }
 
 export const menuItemByRole: Record<Role, MenuItem[]> = {
   seeker: [

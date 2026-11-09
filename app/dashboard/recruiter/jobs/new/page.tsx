@@ -29,64 +29,19 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { useSession } from "@/lib/auth-client"
-import { cn } from "@/lib/utils"
+import { cn, formatSalary } from "@/lib/utils"
 import { createJob } from "@/lib/actions/jobs"
 import { toast } from "@/components/ui/toast"
+import {
+  type JobFormData,
+  INITIAL_FORM_DATA,
+  JOB_CATEGORIES,
+  JOB_TYPES,
+  SALARY_FREQUENCIES,
+} from "@/types"
 
-export interface JobFormData {
-  title: string
-  company: string
-  category: string
-  type: string
-  isRemote: boolean
-  location: string
-  deadline: string
-  minSalary: string
-  maxSalary: string
-  salaryFrequency: string
-  responsibilities: string
-  requirements: string
-  benefits: string
-  status: "Active" | "Closed" | "Draft"
-  applicantsCount: number
-}
-
-const INITIAL_FORM_DATA: JobFormData = {
-  title: "",
-  company: "",
-  category: "Engineering & Tech",
-  type: "Full-time",
-  isRemote: false,
-  location: "",
-  deadline: "",
-  minSalary: "",
-  maxSalary: "",
-  salaryFrequency: "per year",
-  responsibilities: "",
-  requirements: "",
-  benefits: "",
-  status: "Draft",
-  applicantsCount: 0,
-}
-
-const JOB_CATEGORIES = [
-  "Engineering & Tech",
-  "Design & Creative",
-  "Product & Management",
-  "Marketing & Sales",
-  "Customer Support",
-  "Finance & Operations",
-  "Human Resources",
-  "Data & Analytics",
-]
-
-const JOB_TYPES = ["Full-time", "Part-time", "Contract", "Internship"]
-
-const SALARY_FREQUENCIES = [
-  { label: "per year", value: "per year" },
-  { label: "per month", value: "per month" },
-  { label: "per hour", value: "per hour" },
-]
+export type { JobFormData }
+export { INITIAL_FORM_DATA, JOB_CATEGORIES, JOB_TYPES, SALARY_FREQUENCIES }
 
 export default function NewJobPage() {
   const { data: session } = useSession()
