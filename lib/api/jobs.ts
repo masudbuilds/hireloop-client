@@ -2,9 +2,9 @@ import type { ManagedJobPost } from "@/types"
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000"
 
-export const getJobs = async (): Promise<ManagedJobPost[]> => {
+export const getJobs = async (query = ''): Promise<ManagedJobPost[]> => {
   try {
-    const response = await fetch(`${BASE_URL}/jobs`, {
+    const response = await fetch(`${BASE_URL}/jobs?${query}`, {
       cache: "no-store",
     })
     if (!response.ok) {
