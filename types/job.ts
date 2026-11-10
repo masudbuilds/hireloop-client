@@ -72,3 +72,13 @@ export const INITIAL_FORM_DATA: JobFormData = {
   status: "Draft",
   applicantsCount: 0,
 }
+
+export interface JobFilterState {
+  search?: string
+  location?: string
+  type?: string
+  category?: string
+  isRemote?: boolean
+  salaryRange?: string
+  sortBy?: string
+}

@@ -14,6 +14,10 @@ function ThemeProvider({
       enableSystem
       disableTransitionOnChange
       {...props}
+      scriptProps={{
+        ...props.scriptProps,
+        type: typeof window === "undefined" ? "text/javascript" : "text/plain",
+      }}
     >
       <ThemeHotkey />
       {children}
