@@ -5,6 +5,7 @@ import { Filter, RotateCcw } from "lucide-react"
 
 import { JOB_CATEGORIES, JOB_TYPES } from "@/types"
 import { cn } from "@/lib/utils"
+import { useRouter, useSearchParams } from "next/navigation"
 
 export interface FilterOption {
   label: string
@@ -51,17 +52,17 @@ const CATEGORY_OPTIONS: FilterOption[] = [
 
 const WORKPLACE_OPTIONS: FilterOption[] = [
   { label: "All Workplaces", value: "all" },
-  { label: "Remote Only", value: "remote", count: "850" },
+  { label: "Remote Only", value: "isRemote", count: "850" },
   { label: "Hybrid", value: "hybrid", count: "320" },
   { label: "On-site", value: "onsite", count: "190" },
 ]
 
 const SALARY_OPTIONS: FilterOption[] = [
   { label: "Any Salary", value: "any" },
-  { label: "$50k+ / year", value: "50k", count: "980" },
-  { label: "$100k+ / year", value: "100k", count: "640" },
-  { label: "$150k+ / year", value: "150k", count: "310" },
-  { label: "$200k+ / year", value: "200k", count: "120" },
+  { label: "$50k+ / year", value: "50000-1000000", count: "980" },
+  { label: "$100k+ / year", value: "100000-1000000", count: "640" },
+  { label: "$150k+ / year", value: "150000-1000000", count: "310" },
+  { label: "$200k+ / year", value: "200000-1000000", count: "120" },
 ]
 
 export function JobFiltersSidebar({
@@ -69,24 +70,51 @@ export function JobFiltersSidebar({
   selectedCategory,
   selectedTypes,
   selectedCategories,
-  selectedWorkplace = "all",
-  selectedSalary = "any",
+  selectedWorkplace,
+  selectedSalary,
   onFilterChange,
   onClearFilters,
   className,
 }: JobFiltersSidebarProps) {
-  // Single-select resolution (one at a time)
-  const currentType = selectedType ?? selectedTypes?.[0] ?? "all"
-  const currentCategory = selectedCategory ?? selectedCategories?.[0] ?? "all"
+  const router = useRouter()
+  const searchParams = useSearchParams()
 
-  // Empty click/change handler by default as instructed
-  const handleItemClick = (filterKey: string, value: string) => {
+  // Resolve current active selection from props or URL search params
+  const currentType = selectedType ?? searchParams.get("type") ?? selectedTypes?.[0] ?? "all"
+  const currentCategory = selectedCategory ?? searchParams.get("category") ?? selectedCategories?.[0] ?? "all"
+  const currentWorkplace = selectedWorkplace ?? searchParams.get("workplace") ?? "all"
+  const currentSalary = selectedSalary ?? searchParams.get("salary") ?? "any"
+
+  const handleItemClick = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault()
+    const { name, value } = e.target
+
+    const params = new URLSearchParams(searchParams.toString())
+
+    if (value === "all" || value === "any") {
+      params.delete(name)
+    } else {
+      params.set(name, value)
+    }
+
+    const queryString = params.toString()
+    router.push(queryString ? `/jobs?${queryString}` : "/jobs")
+
     if (onFilterChange) {
-      onFilterChange(filterKey, value)
+      onFilterChange(name, value)
     }
   }
 
   const handleReset = () => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.delete("type")
+    params.delete("category")
+    params.delete("workplace")
+    params.delete("salary")
+
+    const queryString = params.toString()
+    router.push(queryString ? `/jobs?${queryString}` : "/jobs")
+
     if (onClearFilters) {
       onClearFilters()
     }
@@ -138,10 +166,10 @@ export function JobFiltersSidebar({
                 <div className="flex items-center gap-2.5">
                   <input
                     type="radio"
-                    name="jobType"
+                    name="type"
                     value={option.value}
                     checked={isSelected}
-                    onChange={() => handleItemClick("type", option.value)}
+                    onChange={handleItemClick}
                     className="size-4 cursor-pointer border-white/20 bg-white/5 text-[#5c53fe] accent-[#5c53fe] focus:ring-[#5c53fe]"
                   />
                   <span>{option.label}</span>
@@ -178,10 +206,10 @@ export function JobFiltersSidebar({
                 <div className="flex items-center gap-2.5">
                   <input
                     type="radio"
-                    name="jobCategory"
+                    name="category"
                     value={option.value}
                     checked={isSelected}
-                    onChange={() => handleItemClick("category", option.value)}
+                    onChange={handleItemClick}
                     className="size-4 cursor-pointer border-white/20 bg-white/5 text-[#5c53fe] accent-[#5c53fe] focus:ring-[#5c53fe]"
                   />
                   <span className="truncate">{option.label}</span>
@@ -201,7 +229,7 @@ export function JobFiltersSidebar({
         </h3>
         <div className="space-y-2">
           {WORKPLACE_OPTIONS.map((option) => {
-            const isSelected = selectedWorkplace === option.value
+            const isSelected = currentWorkplace === option.value
             return (
               <label
                 key={option.value}
@@ -213,7 +241,7 @@ export function JobFiltersSidebar({
                     name="workplace"
                     value={option.value}
                     checked={isSelected}
-                    onChange={() => handleItemClick("workplace", option.value)}
+                    onChange={handleItemClick}
                     className="size-4 cursor-pointer border-white/20 bg-white/5 text-[#5c53fe] accent-[#5c53fe] focus:ring-[#5c53fe]"
                   />
                   <span>{option.label}</span>
@@ -238,7 +266,7 @@ export function JobFiltersSidebar({
         </h3>
         <div className="space-y-2">
           {SALARY_OPTIONS.map((option) => {
-            const isSelected = selectedSalary === option.value
+            const isSelected = currentSalary === option.value
             return (
               <label
                 key={option.value}
@@ -250,7 +278,7 @@ export function JobFiltersSidebar({
                     name="salary"
                     value={option.value}
                     checked={isSelected}
-                    onChange={() => handleItemClick("salary", option.value)}
+                    onChange={handleItemClick}
                     className="size-4 cursor-pointer border-white/20 bg-white/5 text-[#5c53fe] accent-[#5c53fe] focus:ring-[#5c53fe]"
                   />
                   <span>{option.label}</span>

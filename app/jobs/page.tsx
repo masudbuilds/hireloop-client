@@ -75,7 +75,13 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
           <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
             {/* Desktop Sidebar Filters */}
             <div className="hidden w-72 shrink-0 lg:block xl:w-80">
-              <JobFiltersSidebar className="sticky top-24" />
+              <JobFiltersSidebar
+                selectedType={typeof search?.type === "string" ? search.type : undefined}
+                selectedCategory={typeof search?.category === "string" ? search.category : undefined}
+                selectedWorkplace={typeof search?.workplace === "string" ? search.workplace : undefined}
+                selectedSalary={typeof search?.salary === "string" ? search.salary : undefined}
+                className="sticky top-24"
+              />
             </div>
 
             {/* Right Side: Results Header & Job Grid */}
@@ -93,7 +99,12 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
 
                 <div className="flex items-center gap-3">
                   {/* Mobile Filters Drawer */}
-                  <MobileFiltersDrawer />
+                  <MobileFiltersDrawer
+                    selectedType={typeof search?.type === "string" ? search.type : undefined}
+                    selectedCategory={typeof search?.category === "string" ? search.category : undefined}
+                    selectedWorkplace={typeof search?.workplace === "string" ? search.workplace : undefined}
+                    selectedSalary={typeof search?.salary === "string" ? search.salary : undefined}
+                  />
 
                   {/* Sort Dropdown */}
                   <JobSortDropdown />
