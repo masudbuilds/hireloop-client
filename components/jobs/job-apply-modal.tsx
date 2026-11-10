@@ -74,6 +74,33 @@ export function JobApplyModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    const applicationData = {
+      jobId,
+      fullName: formData.fullName,
+      email: formData.email,
+      portfolioUrl: formData.portfolioUrl,
+      note: formData.note,
+    }
+
+    const result = await applyToAJob(applicationData)
+    if(result.insertedId) {
+      console.log("Application submitted successfully:", result)
+      toast.add({
+        title: "Application Submitted! 🎉",
+        description: `Your application for ${jobTitle} at ${company} was sent successfully.`,
+        type: "success",
+      })
+      router.push(`/jobs/`)
+    } else {
+      console.error("Failed to submit application:", result)
+      toast.add({
+        title: "Application Failed",
+        description: `There was an error submitting your application for ${jobTitle} at ${company}. Please try again.`,
+        type: "error",
+      })
+      return
+    } 
     setIsSubmitting(true)
 
     // Simulate submission delay
@@ -82,12 +109,6 @@ export function JobApplyModal({
     setIsSubmitting(false)
     setHasApplied(true)
     setOpen(false)
-
-    toast.add({
-      title: "Application Submitted! 🎉",
-      description: `Your application for ${jobTitle} at ${company} was sent successfully.`,
-      type: "success",
-    })
   }
 
   return (
@@ -130,7 +151,7 @@ export function JobApplyModal({
         side="right"
         className="w-full border-l border-white/10 bg-[#0c0c0e] p-6 text-white sm:max-w-md"
       >
-        <SheetHeader className="pb-4 border-b border-white/10">
+        <SheetHeader className="border-b border-white/10 pb-4">
           <div className="inline-flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70">
             <span className="size-1.5 rounded-full bg-[#5c53fe]" />
             <span>Quick Application</span>
@@ -139,52 +160,69 @@ export function JobApplyModal({
             Apply to {company}
           </SheetTitle>
           <SheetDescription className="text-xs text-white/50">
-            {jobTitle} {location ? `· ${location}` : ""} {salary ? `· ${salary}` : ""}
+            {jobTitle} {location ? `· ${location}` : ""}{" "}
+            {salary ? `· ${salary}` : ""}
           </SheetDescription>
         </SheetHeader>
 
-        <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
+        <form className="mt-6 flex flex-col gap-4">
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-white/80">Full Name *</label>
+            <label className="text-xs font-medium text-white/80">
+              Full Name *
+            </label>
             <input
               required
               type="text"
               value={formData.fullName}
-              onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, fullName: e.target.value })
+              }
               placeholder="e.g. Alex Morgan"
               className="h-10 w-full rounded-xl border border-white/10 bg-white/5 px-3.5 text-sm text-white placeholder:text-white/30 focus:border-[#5c53fe] focus:outline-none"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-white/80">Email Address *</label>
+            <label className="text-xs font-medium text-white/80">
+              Email Address *
+            </label>
             <input
               required
               type="email"
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
               placeholder="alex@example.com"
               className="h-10 w-full rounded-xl border border-white/10 bg-white/5 px-3.5 text-sm text-white placeholder:text-white/30 focus:border-[#5c53fe] focus:outline-none"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-white/80">Portfolio or LinkedIn URL</label>
+            <label className="text-xs font-medium text-white/80">
+              Portfolio or LinkedIn URL
+            </label>
             <input
               type="url"
               value={formData.portfolioUrl}
-              onChange={(e) => setFormData({ ...formData, portfolioUrl: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, portfolioUrl: e.target.value })
+              }
               placeholder="https://linkedin.com/in/alex"
               className="h-10 w-full rounded-xl border border-white/10 bg-white/5 px-3.5 text-sm text-white placeholder:text-white/30 focus:border-[#5c53fe] focus:outline-none"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-white/80">Note to Hiring Manager</label>
+            <label className="text-xs font-medium text-white/80">
+              Note to Hiring Manager
+            </label>
             <textarea
               rows={3}
               value={formData.note}
-              onChange={(e) => setFormData({ ...formData, note: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, note: e.target.value })
+              }
               placeholder="Briefly describe why you are a great match for this role..."
               className="w-full resize-none rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white placeholder:text-white/30 focus:border-[#5c53fe] focus:outline-none"
             />
@@ -192,12 +230,15 @@ export function JobApplyModal({
 
           <div className="rounded-xl border border-dashed border-white/10 bg-white/5 p-4 text-center">
             <Upload className="mx-auto size-5 text-white/40" />
-            <p className="mt-1 text-xs text-white/70">Attach Resume / CV (PDF, DOCX)</p>
+            <p className="mt-1 text-xs text-white/70">
+              Attach Resume / CV (PDF, DOCX)
+            </p>
             <p className="text-[10px] text-white/40">Max file size: 5MB</p>
           </div>
 
           <div className="pt-2">
             <Button
+              onSubmit={handleSubmit}
               type="submit"
               disabled={isSubmitting}
               className="h-11 w-full cursor-pointer rounded-xl bg-[#5c53fe] text-sm font-semibold text-white shadow-[0_0_20px_rgba(92,83,254,0.35)] hover:bg-[#5c53fe]/90"
