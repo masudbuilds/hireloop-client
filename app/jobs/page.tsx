@@ -20,10 +20,14 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
 
   if (search) {
     Object.entries(search).forEach(([key, val]) => {
-      if (typeof val === "string") {
-        urlSearch.set(key, val)
+      if (typeof val === "string" && val.trim()) {
+        urlSearch.set(key, val.trim())
       } else if (Array.isArray(val)) {
-        val.forEach((v) => urlSearch.append(key, v))
+        val.forEach((v) => {
+          if (typeof v === "string" && v.trim()) {
+            urlSearch.append(key, v.trim())
+          }
+        })
       }
     })
   }
@@ -57,7 +61,10 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
 
               {/* Search Bar */}
               <div className="mt-8 w-full">
-                <JobSearchBar />
+                <JobSearchBar
+                  defaultValue={typeof search?.search === "string" ? search.search : ""}
+                  defaultLocation={typeof search?.location === "string" ? search.location : ""}
+                />
               </div>
             </div>
           </div>

@@ -5,6 +5,7 @@ import { MapPin, Search } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { useRouter } from "next/navigation"
 
 interface JobSearchBarProps {
   defaultValue?: string
@@ -19,15 +20,49 @@ export function JobSearchBar({
   onSearch,
   className,
 }: JobSearchBarProps) {
+  const router = useRouter()
   const [query, setQuery] = React.useState(defaultValue)
   const [location, setLocation] = React.useState(defaultLocation)
 
+  React.useEffect(() => {
+    setQuery(defaultValue)
+  }, [defaultValue])
+
+  React.useEffect(() => {
+    setLocation(defaultLocation)
+  }, [defaultLocation])
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    // Empty handler as instructed; ready for user to implement
+
+    const formData = new FormData(e.currentTarget)
+    const data = Object.fromEntries(formData.entries())
+
+    const searchStr = (typeof data.searchField === "string" ? data.searchField : query || "").trim()
+    const locationStr = (typeof data.location === "string" ? data.location : location || "").trim()
+
     if (onSearch) {
-      onSearch(query, location)
+      onSearch(searchStr, locationStr)
+      return
     }
+
+    const currentSearch = typeof window !== "undefined" ? window.location.search : ""
+    const params = new URLSearchParams(currentSearch)
+
+    if (searchStr) {
+      params.set("search", searchStr)
+    } else {
+      params.delete("search")
+    }
+
+    if (locationStr) {
+      params.set("location", locationStr)
+    } else {
+      params.delete("location")
+    }
+
+    const qs = params.toString()
+    router.push(qs ? `/jobs?${qs}` : "/jobs")
   }
 
   return (
@@ -50,7 +85,7 @@ export function JobSearchBar({
         </label>
         <input
           id="job-search-query"
-          name="q"
+          name="searchField"
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
