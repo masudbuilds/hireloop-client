@@ -15,6 +15,7 @@ import {
   SheetDescription,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { useRouter } from "next/navigation"
 
 interface JobApplyModalProps {
   jobId: string
@@ -36,6 +37,8 @@ export function JobApplyModal({
   variant = "primary",
 }: JobApplyModalProps) {
   const { data: session } = useSession()
+  const user = session?.user
+  const router = useRouter()
   const [open, setOpen] = React.useState(false)
   const [hasApplied, setHasApplied] = React.useState(false)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
@@ -57,6 +60,17 @@ export function JobApplyModal({
       }))
     }
   }, [session])
+
+  const handleApplyClick = () => {
+    if (!user) {
+      router.push(`/sign-in?redirectTo=/jobs/${jobId}`)
+      return
+    } else {
+      // save the application to the database
+      console.log("save the application to the database")
+    }
+    setOpen(true)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -81,6 +95,7 @@ export function JobApplyModal({
       <SheetTrigger
         render={
           <Button
+            onClick={handleApplyClick}
             type="button"
             disabled={hasApplied}
             className={cn(

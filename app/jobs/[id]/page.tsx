@@ -1,6 +1,4 @@
-import React from "react"
 import Link from "next/link"
-import { notFound } from "next/navigation"
 import {
   ArrowLeft,
   Briefcase,
@@ -30,6 +28,7 @@ import { SiteFooter } from "@/components/home/site-footer"
 import { JobCard } from "@/components/jobs/job-card"
 import { JobApplyModal, SaveJobButton } from "@/components/jobs/job-apply-modal"
 import type { ManagedJobPost } from "@/types"
+import { useSession } from "@/lib/auth-client"
 
 interface JobDetailPageProps {
   params: Promise<{ id: string }>

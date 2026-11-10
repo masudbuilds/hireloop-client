@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { authClient } from "@/lib/auth-client"
+import { useRouter, useSearchParams } from "next/navigation"
 
 function GoogleIcon({ className }: { className?: string }) {
   return (
@@ -36,6 +37,10 @@ const FIELD_CLASSES =
   "h-11 rounded-lg border-white/15 bg-[#101010] px-3.5 text-[15px] text-white placeholder:text-white/40 hover:border-white/25 focus-visible:border-[#5c53fe] focus-visible:ring-2 focus-visible:ring-[#5c53fe]/30"
 
 export default function SignInPage() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get("redirectTo") || "/"
+  console.log("Redirect to:", redirectTo)
   const [formData, setFormData] = React.useState({
     email: "",
     password: "",
@@ -65,7 +70,7 @@ export default function SignInPage() {
         email: formData.email,
         password: formData.password,
         rememberMe: formData.rememberMe,
-        callbackURL: "/",
+        callbackURL: redirectTo,
       })
 
       // Handle sign-in error (e.g. invalid credentials)
@@ -78,7 +83,7 @@ export default function SignInPage() {
         setLoading(false)
         return
       }
-
+      router.push(redirectTo)
       console.log("Sign In successful:", resData)
 
       // Redirect on success
@@ -102,7 +107,7 @@ export default function SignInPage() {
     <div className="relative z-10 flex w-full max-w-md flex-col gap-6 rounded-2xl border border-white/10 bg-[#151516] p-6 shadow-[0_4px_24px_rgba(0,0,0,0.4)] sm:p-8">
       {/* Header */}
       <div className="flex flex-col gap-1.5">
-        <h1 className="font-heading text-2xl font-bold leading-tight text-white sm:text-3xl">
+        <h1 className="font-heading text-2xl leading-tight font-bold text-white sm:text-3xl">
           Welcome back
         </h1>
         <p className="text-sm text-white/60">
@@ -181,7 +186,7 @@ export default function SignInPage() {
               aria-label={showPassword ? "Hide password" : "Show password"}
               aria-pressed={showPassword}
               onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute right-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-md text-white/50 transition-colors hover:text-white"
+              className="absolute top-1/2 right-2 flex size-8 -translate-y-1/2 items-center justify-center rounded-md text-white/50 transition-colors hover:text-white"
             >
               {showPassword ? (
                 <EyeOffIcon className="size-4" />
@@ -204,7 +209,7 @@ export default function SignInPage() {
           />
           <label
             htmlFor="rememberMe"
-            className="cursor-pointer select-none text-sm text-white/70"
+            className="cursor-pointer text-sm text-white/70 select-none"
           >
             Remember me
           </label>
@@ -214,7 +219,7 @@ export default function SignInPage() {
         <Button
           type="submit"
           disabled={loading}
-          className="h-11 w-full rounded-lg bg-[#5c53fe] text-[15px] font-medium text-white shadow-[inset_0_0_10px_rgba(255,255,255,0.2)] hover:bg-[#5c53fe]/90 transition-all cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+          className="h-11 w-full cursor-pointer rounded-lg bg-[#5c53fe] text-[15px] font-medium text-white shadow-[inset_0_0_10px_rgba(255,255,255,0.2)] transition-all hover:bg-[#5c53fe]/90 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading ? "Signing in..." : "Sign In"}
         </Button>
