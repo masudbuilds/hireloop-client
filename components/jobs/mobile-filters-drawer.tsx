@@ -14,6 +14,8 @@ import {
 import { JobFiltersSidebar } from "@/components/jobs/job-filters-sidebar"
 
 interface MobileFiltersDrawerProps {
+  selectedType?: string
+  selectedCategory?: string
   selectedTypes?: string[]
   selectedCategories?: string[]
   selectedWorkplace?: string
