@@ -16,3 +16,18 @@ export const getJobs = async (query = ''): Promise<ManagedJobPost[]> => {
     return []
   }
 }
+
+export const getJobById = async (id: string): Promise<ManagedJobPost | null> => {
+  try {
+    const response = await fetch(`${BASE_URL}/jobs/${id}`, {
+      cache: "no-store",
+    })
+    if (!response.ok) {
+      return null
+    }
+    return await response.json()
+  } catch (error) {
+    console.error("Error in getJobById:", error)
+    return null
+  }
+}
