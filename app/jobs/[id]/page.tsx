@@ -196,6 +196,8 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
                 company={companyName}
                 location={location}
                 salary={salaryDisplay}
+                jobType={jobType}
+                workplace={fetchedJob?.isRemote ? "Remote" : "On-site"}
                 variant="header"
                 className="flex-1 sm:flex-initial"
               />
@@ -476,6 +478,8 @@ export default async function JobDetailPage({ params }: JobDetailPageProps) {
                     company={companyName}
                     location={location}
                     salary={salaryDisplay}
+                    jobType={jobType}
+                    workplace={fetchedJob?.isRemote ? "Remote" : "On-site"}
                     variant="primary"
                   />
                 </div>
