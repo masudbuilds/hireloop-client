@@ -51,95 +51,6 @@ import { useSession } from "@/lib/auth-client"
 import { getApplicationsBySeeker } from "@/lib/actions/applications"
 import type { ApplicationStatus, JobApplication } from "@/types"
 
-// Dummy applications matching the Figma design for initial view
-const DUMMY_APPLICATIONS: JobApplication[] = [
-  {
-    _id: "app-1",
-    jobId: "job-101",
-    jobTitle: "Senior Frontend Engineer",
-    company: "Stark Industries",
-    location: "New York, NY (Remote)",
-    salary: "$140k - $175k",
-    jobType: "Full-time",
-    workplace: "Remote",
-    seekerName: "Alexander Seeker",
-    seekerEmail: "alex@example.com",
-    portfolioUrl: "https://portfolio.dev/alex",
-    note: "Excited about building high-performance reactive interfaces and scaling web platforms.",
-    status: "In Review",
-    appliedAt: "2026-11-10T16:00:00.000Z",
-    appliedAgo: "2 hours ago",
-  },
-  {
-    _id: "app-2",
-    jobId: "job-102",
-    jobTitle: "Product Designer",
-    company: "Cyberdyne Systems",
-    location: "Los Angeles, CA",
-    salary: "$120k - $150k",
-    jobType: "Contract",
-    workplace: "Hybrid",
-    seekerName: "Alexander Seeker",
-    seekerEmail: "alex@example.com",
-    portfolioUrl: "https://dribbble.com/alex",
-    note: "Specialized in dark-mode design systems, accessible UI patterns, and rapid prototyping in Figma.",
-    status: "Interview",
-    appliedAt: "2026-11-09T14:30:00.000Z",
-    appliedAgo: "1 day ago",
-  },
-  {
-    _id: "app-3",
-    jobId: "job-103",
-    jobTitle: "Lead Data Scientist",
-    company: "Wayne Enterprises",
-    location: "Gotham / Chicago, IL",
-    salary: "$160k - $210k",
-    jobType: "Full-time",
-    workplace: "On-site",
-    seekerName: "Alexander Seeker",
-    seekerEmail: "alex@example.com",
-    portfolioUrl: "https://github.com/alex",
-    note: "Background in applied ML, predictive pipelines, and automated intelligence analysis.",
-    status: "Shortlisted",
-    appliedAt: "2026-11-06T10:15:00.000Z",
-    appliedAgo: "4 days ago",
-  },
-  {
-    _id: "app-4",
-    jobId: "job-104",
-    jobTitle: "Cloud Architect",
-    company: "Oscorp Tech",
-    location: "Austin, TX",
-    salary: "$150k - $190k",
-    jobType: "Full-time",
-    workplace: "Remote",
-    seekerName: "Alexander Seeker",
-    seekerEmail: "alex@example.com",
-    portfolioUrl: "https://linkedin.com/in/alex",
-    note: "Designing resilient multi-cloud container orchestration infrastructures.",
-    status: "Rejected",
-    appliedAt: "2026-11-03T09:00:00.000Z",
-    appliedAgo: "1 week ago",
-  },
-  {
-    _id: "app-5",
-    jobId: "job-105",
-    jobTitle: "AI Research Engineer",
-    company: "Hooli Corp",
-    location: "Palo Alto, CA",
-    salary: "$180k - $240k",
-    jobType: "Full-time",
-    workplace: "Hybrid",
-    seekerName: "Alexander Seeker",
-    seekerEmail: "alex@example.com",
-    portfolioUrl: "https://huggingface.co/alex",
-    note: "Focusing on large language model alignment, context retrieval, and agent frameworks.",
-    status: "Offered",
-    appliedAt: "2026-10-27T11:00:00.000Z",
-    appliedAgo: "2 weeks ago",
-  },
-]
-
 const STATUS_FILTERS: Array<"All" | ApplicationStatus> = [
   "All",
   "In Review",
@@ -151,29 +62,31 @@ const STATUS_FILTERS: Array<"All" | ApplicationStatus> = [
 
 export default function SeekerApplicationsPage() {
   const { data: session } = useSession()
-  const [applications, setApplications] = React.useState<JobApplication[]>(DUMMY_APPLICATIONS)
-  const [isLoading, setIsLoading] = React.useState(false)
+  const [applications, setApplications] = React.useState<JobApplication[]>([])
+  const [isLoading, setIsLoading] = React.useState(true)
   const [searchQuery, setSearchQuery] = React.useState("")
   const [selectedStatus, setSelectedStatus] = React.useState<string>("All")
   const [activeTab, setActiveTab] = React.useState<"active" | "archived">("active")
   const [selectedApplication, setSelectedApplication] = React.useState<JobApplication | null>(null)
   const [detailsOpen, setDetailsOpen] = React.useState(false)
 
-  // Try to load any actual user applications from the backend if available
+  // Load user applications from the backend
   React.useEffect(() => {
     async function loadUserApplications() {
       if (session?.user?.email) {
         try {
           setIsLoading(true)
           const liveData = await getApplicationsBySeeker(session.user.email)
-          if (liveData && liveData.length > 0) {
-            setApplications(liveData)
-          }
-        } catch {
-          // Keep dummy applications on connection error
+          setApplications(liveData || [])
+        } catch (error) {
+          console.error("Error loading applications:", error)
+          setApplications([])
         } finally {
           setIsLoading(false)
         }
+      } else if (session === null) {
+        setIsLoading(false)
+        setApplications([])
       }
     }
     loadUserApplications()
@@ -408,7 +321,16 @@ export default function SeekerApplicationsPage() {
             </TableHeader>
 
             <TableBody>
-              {filteredApplications.length > 0 ? (
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="py-16 text-center text-sm text-white/50">
+                    <div className="flex flex-col items-center justify-center gap-3">
+                      <div className="size-6 animate-spin rounded-full border-2 border-[#5c53fe] border-t-transparent" />
+                      <span>Loading applications...</span>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : filteredApplications.length > 0 ? (
                 filteredApplications.map((app) => (
                   <TableRow
                     key={app._id || `${app.jobId}-${app.appliedAt}`}
