@@ -87,11 +87,11 @@ export function JobApplyModal({
       return
     }
 
-    if(user.role === "seeker") {
-      const countResult = await getApplicationCountBySeeker(`appliclantId=${user.id}`)
+    if (user.role === "seeker") {
+      const count = await getApplicationCountBySeeker(user.email)
 
-      if(countResult.count >= 10) {
-        router.push('/payment')
+      if (count >= 10) {
+        router.push("/payment")
         return
       }
     }

@@ -41,7 +41,7 @@ export const getApplicationsBySeeker = async (seekerEmail?: string): Promise<Job
 export const getApplicationCountBySeeker = async (seekerEmail?: string): Promise<number> => {
   try {
     const query = seekerEmail ? `?seekerEmail=${encodeURIComponent(seekerEmail)}` : ""
-    const response = await fetch(`${BASE_URL}/applications/count?${query}`, {
+    const response = await fetch(`${BASE_URL}/applications/count${query}`, {
       cache: "no-store",
     })
     if (!response.ok) {
