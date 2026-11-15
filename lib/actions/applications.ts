@@ -36,3 +36,21 @@ export const getApplicationsBySeeker = async (seekerEmail?: string): Promise<Job
     return []
   }
 }
+
+
+export const getApplicationCountBySeeker = async (seekerEmail?: string): Promise<number> => {
+  try {
+    const query = seekerEmail ? `?seekerEmail=${encodeURIComponent(seekerEmail)}` : ""
+    const response = await fetch(`${BASE_URL}/applications/count?${query}`, {
+      cache: "no-store",
+    })
+    if (!response.ok) {
+      return 0
+    }
+    const data = await response.json()
+    return data.count || 0
+  } catch (error) {
+    console.error("Error in getApplicationCountBySeeker:", error)
+    return 0
+  }
+}

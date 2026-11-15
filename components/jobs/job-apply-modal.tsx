@@ -16,7 +16,7 @@ import {
   SheetDescription,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { applyToAJob } from "@/lib/actions/applications"
+import { applyToAJob, getApplicationCountBySeeker } from "@/lib/actions/applications"
 import type { JobApplicationInput } from "@/types"
 
 interface JobApplyModalProps {
@@ -85,6 +85,15 @@ export function JobApplyModal({
     if (!user) {
       router.push(`/sign-in?redirectTo=/jobs/${jobId}`)
       return
+    }
+
+    if(user.role === "seeker") {
+      const countResult = await getApplicationCountBySeeker(`appliclantId=${user.id}`)
+
+      if(countResult.count >= 10) {
+        router.push('/payment')
+        return
+      }
     }
 
     if (!formData.fullName.trim() || !formData.email.trim()) {
