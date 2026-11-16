@@ -4,7 +4,22 @@ import * as React from "react"
 import Link from "next/link"
 import { ArrowLeft, ChevronDown, CreditCard, Lock } from "lucide-react"
 
-export default function PaymentPage() {
+export default function PaymentPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ canceled?: string }>
+}) {
+  const resolvedParams = searchParams ? React.use(searchParams) : undefined
+  const canceled = resolvedParams?.canceled
+
+  React.useEffect(() => {
+    if (canceled) {
+      console.log(
+        "Order canceled -- continue to shop around and check out when you're ready."
+      )
+    }
+  }, [canceled])
+
   const [currency, setCurrency] = React.useState<"BDT" | "USD">("BDT")
 
   return (
@@ -69,7 +84,7 @@ export default function PaymentPage() {
               </button>
             </div>
 
-            <p className="mt-2 text-xs italic text-white/40">
+            <p className="mt-2 text-xs text-white/40 italic">
               1 USD = 127.6665 BDT
             </p>
 
@@ -78,16 +93,21 @@ export default function PaymentPage() {
             {/* Plan Info */}
             <div>
               <h3 className="text-xl font-semibold">Hireloop Pro Plan</h3>
-              <p className="mt-1 text-sm text-white/50">Access to all features</p>
+              <p className="mt-1 text-sm text-white/50">
+                Access to all features
+              </p>
               <div className="mt-4 text-2xl font-bold">
                 {currency === "BDT" ? "BDT 2,553.33" : "$20.00"}
-                <span className="text-sm font-normal text-white/50"> / month</span>
+                <span className="text-sm font-normal text-white/50">
+                  {" "}
+                  / month
+                </span>
               </div>
             </div>
           </section>
 
           {/* Right Column: Payment Form */}
-          <section className="rounded-2xl border border-white/10 bg-[#101118] p-6 lg:col-span-7 sm:p-8">
+          <section className="rounded-2xl border border-white/10 bg-[#101118] p-6 sm:p-8 lg:col-span-7">
             {/* Express Checkout: Link */}
             <button
               type="button"
@@ -97,7 +117,9 @@ export default function PaymentPage() {
                 <span className="text-lg font-black tracking-tight">link</span>
               </span>
               <span className="flex items-center gap-2 text-xs font-medium">
-                <span className="rounded bg-black/10 px-1.5 py-0.5 font-bold">VISA</span>
+                <span className="rounded bg-black/10 px-1.5 py-0.5 font-bold">
+                  VISA
+                </span>
                 •••• 4242
               </span>
             </button>
@@ -112,7 +134,7 @@ export default function PaymentPage() {
               </span>
             </div>
 
-            <form onSubmit={(e) => e.preventDefault()} className="space-y-5">
+            <div className="space-y-5">
               {/* Contact Information */}
               <div>
                 <h4 className="text-sm font-semibold text-white/90">
@@ -146,7 +168,7 @@ export default function PaymentPage() {
                   </div>
 
                   {/* Card Inputs */}
-                  <div className="p-4 space-y-3">
+                  <div className="space-y-3 p-4">
                     <div>
                       <span className="text-[11px] font-bold tracking-wider text-white/50">
                         CARD INFORMATION
@@ -158,9 +180,15 @@ export default function PaymentPage() {
                           className="w-full bg-transparent text-sm text-white placeholder:text-white/30 focus:outline-none"
                         />
                         <div className="flex items-center gap-1.5 text-[10px] font-bold text-white/60">
-                          <span className="rounded bg-white/10 px-1 py-0.5">VISA</span>
-                          <span className="rounded bg-white/10 px-1 py-0.5">MC</span>
-                          <span className="rounded bg-white/10 px-1 py-0.5">AMEX</span>
+                          <span className="rounded bg-white/10 px-1 py-0.5">
+                            VISA
+                          </span>
+                          <span className="rounded bg-white/10 px-1 py-0.5">
+                            MC
+                          </span>
+                          <span className="rounded bg-white/10 px-1 py-0.5">
+                            AMEX
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -225,12 +253,18 @@ export default function PaymentPage() {
               </label>
 
               {/* Pay Button */}
-              <button
-                type="button"
-                className="h-12 w-full rounded-xl bg-[#5c53fe] text-base font-semibold text-white shadow-[0_0_25px_rgba(92,83,254,0.4)] transition-all hover:bg-[#5c53fe]/90"
-              >
-                Pay {currency === "BDT" ? "BDT 2,553.33" : "$20.00"}
-              </button>
+
+              <form action="/api/checkout_sessions" method="POST">
+                <section>
+                  <button
+                    type="submit"
+                    role="link"
+                    className="h-12 w-full rounded-xl bg-[#5c53fe] text-base font-semibold text-white shadow-[0_0_25px_rgba(92,83,254,0.4)] transition-all hover:bg-[#5c53fe]/90"
+                  >
+                    Checkout {currency === "BDT" ? "BDT 2,553.33" : "$20.00"}
+                  </button>
+                </section>
+              </form>
 
               {/* Footer */}
               <div className="flex flex-col items-center justify-center gap-2 pt-2 text-xs text-white/40 sm:flex-row">
@@ -239,16 +273,17 @@ export default function PaymentPage() {
                 </span>
                 <span className="hidden sm:inline">·</span>
                 <div className="flex gap-2">
-                  <span className="hover:underline cursor-pointer">Terms</span>
+                  <span className="cursor-pointer hover:underline">Terms</span>
                   <span>·</span>
-                  <span className="hover:underline cursor-pointer">Privacy</span>
+                  <span className="cursor-pointer hover:underline">
+                    Privacy
+                  </span>
                 </div>
               </div>
-            </form>
+            </div>
           </section>
         </div>
       </div>
     </main>
   )
 }
-

@@ -14,14 +14,14 @@ export async function POST() {
       line_items: [
         {
           // Provide the exact Price ID (for example, price_1234) of the product you want to sell
-          price: 'price_1UbzrRH5Afpm0BNtsoyZv4gV ',
+          price: 'price_1UbzrRH5Afpm0BNtsoyZv4gV',
           quantity: 1,
         },
       ],
       mode: 'payment',
-      success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${origin}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
       // Provide a name (for example, hosted_web_0001) to label this Checkout integration and measure its conversion independently
-      integration_identifier: '{{INTEGRATION_ID}}',
+      integration_identifier: 'hireloop_web_0001',
     });
     return NextResponse.redirect(session.url as string, 303)
   } catch (err) {
